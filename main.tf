@@ -1,24 +1,34 @@
 terraform {
+  cloud {
+    organization = "aierohin"
+
+     workspaces {
+      name = "prod"
+    }
+  }
+
   required_providers {
     yandex = {
       source = "yandex-cloud/yandex"
     }
   }
-  backend "s3" {
-    endpoint   = "storage.yandexcloud.net"
-    bucket     = "backend-erohin"
-    region     = "ru-central1"
-    key        = "<terraform/terraform.tfstate"
-    # Key in open view
-    access_key = "YCAJEgSyr8YOSy-J1MueZOFvk"
-    secret_key = "YCMSbEULO903kNLN4cdihzgk3BznEbIM6sjTyqJG"
-
-    skip_region_validation      = true
-    skip_credentials_validation = true
-  }
+  required_version = ">= 0.13"
+#   backend "s3" {
+#     endpoint   = "storage.yandexcloud.net"
+#     bucket     = "backend-erohin"
+#     region     = "ru-central1"
+#     key        = "<terraform/terraform.tfstate"
+#     # Key in open view
+#     access_key = "YCAJEgSyr8YOSy-J1MueZOFvk"
+#     secret_key = "YCMSbEULO903kNLN4cdihzgk3BznEbIM6sjTyqJG"
+#
+#     skip_region_validation      = true
+#     skip_credentials_validation = true
+#   }
 }
 provider "yandex" {
-  service_account_key_file = "//home/erohin/diplom_netology/terraform/key.json"
+  service_account_key_file = file("key.json")
+  #service_account_key_file = file("/home/erohin/diplom_netology/terraform/key.json")
   cloud_id  = "<b1gp7k458hlu48fmqj2v>"
   folder_id = "b1g7umb836h4foki8gu0"
 }
@@ -98,7 +108,7 @@ resource "yandex_compute_instance" "node-cp" {
   }
 
   metadata = {
-    ssh-keys = "centos:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "centos:${file("id_rsa.pub")}"
   }
 }
 # node-worker-1.tf
@@ -130,7 +140,7 @@ resource "yandex_compute_instance" "node-work-1" {
   }
 
   metadata = {
-    ssh-keys = "centos:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "centos:${file("id_rsa.pub")}"
   }
 }
 # node-worker-2.tf
@@ -162,7 +172,7 @@ resource "yandex_compute_instance" "node-work-2" {
   }
 
   metadata = {
-    ssh-keys = "centos:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "centos:${file("id_rsa.pub")}"
   }
 }
 #output.tf
