@@ -28,13 +28,10 @@ terraform {
 }
 provider "yandex" {
   service_account_key_file = file("key.json")
-  #service_account_key_file = file("/home/erohin/diplom_netology/terraform/key.json")
   cloud_id  = "<b1gp7k458hlu48fmqj2v>"
   folder_id = "b1g7umb836h4foki8gu0"
 }
-variable "centos-7-base" {
-  default = "fd89dg08jjghmn88ut7p"
-}
+
 resource "yandex_iam_service_account" "sa" {
   folder_id = "b1g7umb836h4foki8gu0"
   name = "service-account"
@@ -56,30 +53,7 @@ resource "yandex_storage_bucket" "backend" {
   secret_key = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
   bucket     = "backend-erohin"
 }
-# network.tf
-resource "yandex_vpc_network" "net" {
-  name = "net"
-}
 
-resource "yandex_vpc_subnet" "subnet-a" {
-  name = "subnet-a"
-  zone           = "ru-central1-a"
-  network_id     = "${yandex_vpc_network.net.id}"
-  v4_cidr_blocks = ["192.168.101.0/24"]
-}
-resource "yandex_vpc_subnet" "subnet-b" {
-  name = "subnet-b"
-  zone           = "ru-central1-b"
-  network_id     = "${yandex_vpc_network.net.id}"
-  v4_cidr_blocks = ["192.168.102.0/24"]
-}
-resource "yandex_vpc_subnet" "subnet-c" {
-  name = "subnet-c"
-  zone           = "ru-central1-c"
-  network_id     = "${yandex_vpc_network.net.id}"
-  v4_cidr_blocks = ["192.168.103.0/24"]
-}
-#node-cp.tf
 resource "yandex_compute_instance" "node-cp" {
   name                      = "node-cp"
   platform_id               = "standard-v1" # тип процессора (Intel Broadwell)
@@ -111,7 +85,7 @@ resource "yandex_compute_instance" "node-cp" {
     ssh-keys = "centos:${file("id_rsa.pub")}"
   }
 }
-# node-worker-1.tf
+
 resource "yandex_compute_instance" "node-work-1" {
   name                      = "node-work-1"
   platform_id               = "standard-v1" # тип процессора (Intel Broadwell)
@@ -143,7 +117,7 @@ resource "yandex_compute_instance" "node-work-1" {
     ssh-keys = "centos:${file("id_rsa.pub")}"
   }
 }
-# node-worker-2.tf
+
 resource "yandex_compute_instance" "node-work-2" {
   name                      = "node-work-2"
   platform_id               = "standard-v1" # тип процессора (Intel Broadwell)
@@ -174,26 +148,4 @@ resource "yandex_compute_instance" "node-work-2" {
   metadata = {
     ssh-keys = "centos:${file("id_rsa.pub")}"
   }
-}
-#output.tf
-output "internal_ip_address_node-cp_yandex_cloud" {
-  value = "${yandex_compute_instance.node-cp.network_interface.0.ip_address}"
-}
-
-output "external_ip_address_node-cp_yandex_cloud" {
-  value = "${yandex_compute_instance.node-cp.network_interface.0.nat_ip_address}"
-}
-output "internal_ip_address_node-work-1_yandex_cloud" {
-  value = "${yandex_compute_instance.node-work-1.network_interface.0.ip_address}"
-}
-
-output "external_ip_address_node-work-1_yandex_cloud" {
-  value = "${yandex_compute_instance.node-work-1.network_interface.0.nat_ip_address}"
-}
-output "internal_ip_address_node-work-2_yandex_cloud" {
-  value = "${yandex_compute_instance.node-work-2.network_interface.0.ip_address}"
-}
-
-output "external_ip_address_node-work-2_yandex_cloud" {
-  value = "${yandex_compute_instance.node-work-2.network_interface.0.nat_ip_address}"
 }
